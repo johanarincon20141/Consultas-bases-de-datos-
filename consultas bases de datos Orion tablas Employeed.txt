@@ -1,0 +1,124 @@
+proc SQL;
+SELECT*
+FROM orion.employee_information;
+quit;
+
+/* CONSULTA A TABLA*/
+proc SQL
+SELECT Employeed_ID, Employeed_Hire_Date,Salary,
+SELECT Employee_ID,  Employeed_Hire_Date, Salary,
+FROM orion.employee_information;
+quit;
+
+/* CONSULTA BONOS */
+proc SQL;
+SELECT* Employed_ID, Salary, Salary * 0.10 AS BONO
+FROM ORION.EMPLOYEE_INFORMATION;
+quit;
+
+/* CONSULTA DE ACUERDO A SU NIVEL SCAND BUSCAR POR ELEMENTO DE LAS TABLAS COLUMNNAS 
+1 5%
+2 7%
+3 10%
+4 12%
+OTRO 3%
+*/
+proc SQL;
+	SELECT Employee_ID, Salary, Job_Title, 
+		CASE
+			when scan(Job_Title, -1, '')= 'I'
+			 	then Salary* 0.05
+			when scan(Job_Title, -1, '')= 'II'
+			 	then Salary* 0.07
+			when scan(Job_Title, -1, '')= 'III'
+			 	then Salary* 0.10
+			when scan(Job_Title, -1, '')= 'IV'
+			 	then Salary* 0.12
+			 else Salary *0.08
+		END as Bono format= dollar5.
+	from orion.employee_information;
+quit;
+	 
+/* sales 10%
+administracion 8%
+Engenirering 5%
+demas 5%
+Employee = ID, Salary,Departament, bono*/
+ 
+proc SQL;	
+ 
+select Employee_ID, Salary, Department,
+         case
+            when scan(Department, 1, '') = 'Sales Management'
+            THEN Salary*0.10
+            when scan(Department, 1, '') = 'Administration'
+            THEN Salary*0.08	
+            when scan(Department, 1, '') = 'Engineering'
+            THEN Salary*0.10
+            else Salary*0.09
+         end as Bono format = dollar5.
+   from orion.employee_information;
+   quit;
+   
+   /* cumpleaños*/
+proc SQL;
+	select Employee_ID, int((Today()-Birth_Date)/365.25) as Cumpleaños
+	from orion.employee_information;
+quit;
+ 
+ 
+/* fecha de ingreso */
+proc SQL;
+	select Employee_ID, int((Today()-Birth_Date)/365.25) as Cumpleaños
+	from orion.employee_information;
+quit;
+
+/*consulta la fecha que lleva con la empresa */
+proc SQL;
+	select Employee_ID, floor((Today()-Birth_Date)/365.25) as Cumpleanos
+	from orion.employee_information;
+quit;
+
+/*tabla de Employed_Payroll*/
+   proc SQL;
+    select 
+        Employee_ID, 
+        Salary, 
+        Marital_Status, 
+        Dependents, 
+        Salary * 0.30 as Inpuestos
+    from 
+        orion.employee_payroll;
+quit;
+
+/*salairo mayor a 500*/
+proc SQL;
+    SELECT 
+        "Job Title",
+        Salary
+    FROM 
+        orion.employee_information
+    WHERE 
+        Salary > 50000; 
+        quit;
+		
+/*salairo mayor a 500*/
+proc SQL;
+    select 
+        Employee_ID,
+        Job_Title,
+        Employee_Hire_Date as Contratacion
+    from 
+        orion.employee_information
+    where 
+        calculated Contratacion > '10'd;
+quit;
+
+/*Bono 10%, bono semestral*/
+proc sql;
+select Employee_ID, 
+Job_Title,
+Salary*0.05 as Bono
+FROM  orion.employee_information
+where calculated Bono > 1000;
+quit; 

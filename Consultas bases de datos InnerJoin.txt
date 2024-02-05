@@ -1,0 +1,343 @@
+proc SQL;
+SELECT*
+FROM orion.employee_information;
+quit;
+/* CONSULTA A TABLA*/
+proc SQL
+SELECT Employeed_ID, Employeed_Hire_Date,Salary,
+SELECT Employee_ID,  Employeed_Hire_Date, Salary,
+FROM orion.employee_information;
+quit;
+
+/* CONSULTA BONOS"Employee_ID", "Salary" y calculará el bono como el 10% del salario para cada empleado en la tabla employee_information */
+proc SQL;
+    SELECT Employee_ID, Salary, Salary * 0.10 AS BONO
+    FROM orion.employee_information;
+quit;
+
+/* CONSULTA DE ACUERDO A SU NIVEL SCAND BUSCAR POR ELEMENTO DE LAS TABLAS COLUMNNAS 
+1 5%
+2 7%
+3 10%
+4 12%
+OTRO 3%
+*/
+/*alcular un bono basado en el título del trabajo (Job_Title). La función SCAN se utiliza para extraer la última palabra del título del trabajo y se compara con diferentes niveles ("I", "II", "III", "IV"). Si el nivel no coincide con ninguno de los casos anteriores, se utiliza un valor predeterminado de 0.08.*/
+proc SQL;
+	SELECT Employee_ID, Salary, Job_Title, 
+		CASE
+			when scan(Job_Title, -1, '')= 'I'
+			 	then Salary* 0.05
+			when scan(Job_Title, -1, '')= 'II'
+			 	then Salary* 0.07
+			when scan(Job_Title, -1, '')= 'III'
+			 	then Salary* 0.10
+			when scan(Job_Title, -1, '')= 'IV'
+			 	then Salary* 0.12
+			 else Salary *0.08
+		END as Bono format= dollar5.
+	from orion.employee_information;
+quit; 	
+	
+/* sales 10%
+administracion 8%
+Engenirering 5%
+demas 5%
+Employee = ID, Salary,Departament, bono*/
+
+proc SQL;	
+
+select Employee_ID, Salary, Department,
+         case
+            when scan(Department, 1, '') = 'Sales Management'
+            THEN Salary*0.10
+            when scan(Department, 1, '') = 'Administration'
+            THEN Salary*0.08	
+            when scan(Department, 1, '') = 'Engineering'
+            THEN Salary*0.10
+            else Salary*0.09
+         end as Bono format = dollar5.
+   from orion.employee_information;
+   /* cumpleaños*/
+ proc SQL;
+	select Employee_ID, int((Today()-Birth_Date)/365.25) as Cumpleaños
+	from orion.employee_information;
+quit;
+
+
+/* fecha de ingreso */
+ proc SQL;
+	select Employee_ID, int((Today()-Birth_Date)/365.25) as Cumpleaños
+	from orion.employee_information;
+quit;
+/*consulta la fecha que lleva con la empresa */
+proc SQL;
+	select Employee_ID, floor((Today()-Birth_Date)/365.25) as Cumpleanos
+	from orion.employee_information;
+quit;
+/*tabla de Employed_Payroll*/
+/*un impuesto del 20% sobre el salario*/
+
+proc SQL;
+    select 
+        Employee_ID, 
+        Salary, 
+        Marital_Status, 
+        Dependents, 
+        Salary * 0.20 as Impuestos
+    from 
+        orion.employee_payroll;
+QUIT;
+    
+   proc SQL;
+    select 
+        Employee_ID, 
+        Salary, 
+        Marital_Status, 
+        Dependents, 
+        Salary * 0.30 as Impuestos
+    from 
+        orion.employee_payroll;
+quit;
+/*salairo mayor a 500 ok */
+proc SQL;
+    SELECT 
+        "Job Title",
+        Salary
+    FROM 
+        orion.employee_information
+    WHERE 
+        Salary > 50000; 
+        quit;
+/*salairo mayor a 500*/
+proc SQL;
+    select 
+        Employee_ID,
+        Job_Title,
+        Employee_Hire_Date as Contratacion
+    from 
+        orion.employee_information
+    where 
+        calculated Contratacion > '10'd;
+quit;
+
+
+/*consulta seleccionará las filas donde el bono calculado (Salary * 0.05) sea mayor que 1000*/
+/*Bono 10%, bono semestral*/
+proc sql;
+select Employee_ID, 
+Job_Title,
+ Salary*0.05 as Bono
+from orion.employee_information
+where calculated Bono > 1000;
+quit; 
+
+proc sql;
+select Employee_ID, Job _ Title, Salary*00.5 as Bono
+from orion . employee _ information
+where calculated Bono > 1000;
+quit;
+
+/*Bono del 5%* order*/
+
+proc sql number;/*numero de indice*/
+	TITLE 'Bono semestral';
+	select Employee_ID , Job_Title,'Su bono es:' , Salary*0.05 as Bono
+	from orion.employee_information
+	ORDER BY 1,3 DESC;
+quit;
+
+proc sql number;/*numero de indice*/
+	TITLE 'Impuesto pagado por los empleados';
+	select Employee_ID, salary, salary*0.08 as Impuesto Federal,
+	
+	from orion.employee_information
+	WHERE "Employee Gender"='M'
+ 	ORDER BY 1, DESC;	
+quit;
+
+/*sentencia de contar y agrupar*/
+
+/* productos astralianos */
+proc SQL;
+    TITLE 'Productos Australianos y por clotehes';
+    SELECT Supplier_Name, Product_Name, Product_Group
+    FROM orion.product_dim
+    WHERE Supplier_Country = 'AU' AND Product_Category = 'Clothes'
+    ORDER BY 2;
+QUIT;
+/*Numero de productos importados por pais */
+PROC SQL;
+TITLE 'Numero de productos importados por pais' ;
+SELECT Supplier_country, count(Product_Name) as Productos
+FROM orion.product_dim
+GROUP BY Supplier_country
+ORDER BY Productos;
+quit;
+/**/
+PROC SQL;
+    TITLE 'Número de empleados por sexo';
+    SELECT Employee_Gender, count(*) as Numero_De_Empleados
+    FROM orion.employee_information
+    GROUP BY Employee_Gender
+    ORDER BY Numero_De_Empleados DESC; /* Puedes usar ASC si quieres ordenar de forma ascendente */
+QUIT;
+
+/*from la tabla orion.employee_informaction , buscar el total de clientes feminimos y total de clientes mas
+culinos el pais el %de los cuales son masculinos */
+
+PROC SQL number;
+    TITLE 'Total de clientes femeninos, masculinos y porcentaje masculino';
+    SELECT
+        COUNT(CASE WHEN Employee_Gender = 'F' THEN 1 END) as Total_Femeninos,
+        COUNT(CASE WHEN Employee_Gender = 'M' THEN 1 END) as Total_Masculinos,
+        (COUNT(CASE WHEN Employee_Gender = 'M'  THEN 1 END) / COUNT(*)) * 100 as Porcentaje_Masculino
+      
+    FROM
+        orion.employee_information;
+  
+QUIT;
+
+PROC SQL number;
+    TITLE 'Porcentaje de hombres y mujeres por país';
+    SELECT
+        Supplier_Country,
+        COUNT(CASE WHEN Employee_Gender = 'F' THEN 1 END) as Total_Femeninos,
+        COUNT(CASE WHEN Employee_Gender = 'M' THEN 1 END) as Total_Masculinos,
+        (COUNT(CASE WHEN Employee_Gender = 'F' THEN 1 END) / COUNT(*)) * 100 as Porcentaje_Femenino,
+        (COUNT(CASE WHEN Employee_Gender = 'M' THEN 1 END) / COUNT(*)) * 100 as Porcentaje_Masculino
+    FROM
+        orion.employee_information
+    GROUP BY
+        Country
+    ORDER BY
+        Country;
+QUIT;
+/*consulta de los telefonos */
+PROC SQL number;
+    TITLE 'Consulta a la tabla de teléfonos';
+    SELECT Employee_ID, Phone_Number
+    FROM orion.employee_phones;
+QUIT;
+/*innerjoin de dos tablas */
+proc sql number;
+    select 
+        employee_phones.Employee_ID,
+        employee_phones.Phone_Number,
+        employee_information.Start_Date
+    from 
+        orion.employee_phones
+    inner join 
+        orion.employee_information 
+    on 
+        employee_phones.Employee_ID = employee_information.Employee_ID;
+Quit;
+/*innerjoin de tres tablas */
+proc sql number;
+    select 
+        employee_phones.Employee_ID,
+        employee_phones.Phone_Number,
+        employee_information.Start_Date,
+        employee_payroll.Salary
+    from 
+        orion.employee_phonesempl
+    inner join 
+        orion.employee_information 
+    on 
+        employee_phones.Employee_ID = employee_information.Employee_ID
+        
+        inner join
+        orion.employee_payroll
+        on
+        employee_information.Employee_ID= employee_payroll.Employee_ID
+        
+        
+        
+Quit;
+
+
+proc sql number;
+    select 
+     employee_phones.Employee_ID,
+     employee_phones.Phone_Number,
+      employee_information.Start_Date,
+      employee_payroll.Salary
+    from 
+        orion.employee_phones
+    inner join 
+        orion.employee_information 
+    on 
+        employee_phones.Employee_ID = employee_information.Employee_ID
+    inner join
+        orion.employee_payroll
+    on
+        employee_information.Employee_ID = employee_payroll.Employee_ID;
+        
+        where 
+        employee_payroll.Salary > 50000
+        and employee_information.Department = 'Accounts'
+        and employee_information.Job_Title = 'Office Assistant II';
+        
+Quit;
+/*INNER JOIN DE 4 TABLAS */
+proc sql number;
+    select 
+        employee_phones.Employee_ID,
+        employee_phones.Phone_Number,
+        employee_information.Start_Date,
+        employee_payroll.Salary,
+        employee_addresses.Employee_Name
+    from 
+        orion.employee_phones
+    inner join 
+        orion.employee_information 
+    on 
+        employee_phones.Employee_ID = employee_information.Employee_ID
+    inner join
+        orion.employee_payroll
+    on
+        employee_information.Employee_ID = employee_payroll.Employee_ID
+      
+        inner join
+        orion.employee_addresses
+        on
+        employee_payroll.Employee_ID = employee_addresses.Employee_ID;
+        
+        WHERE TRIM(employee_information.Job_Title) = 'A';
+ 
+Quit;
+/*INNER JOIN DE CUATRO TABLAS CON UN WHERE OK*/
+proc sql number;
+    select 
+        employee_phones.Employee_ID,
+        employee_phones.Phone_Number,
+        employee_information.Start_Date,
+        employee_payroll.Salary,
+        employee_addresses.Employee_Name
+    from 
+        orion.employee_phones
+    inner join 
+        orion.employee_information 
+    on 
+        employee_phones.Employee_ID = employee_information.Employee_ID
+    inner join
+        orion.employee_payroll
+    on
+        employee_information.Employee_ID = employee_payroll.Employee_ID
+      
+    inner join
+        orion.employee_addresses
+    on
+        employee_payroll.Employee_ID = employee_addresses.Employee_ID
+        
+  WHERE UPCASE(TRIM(employee_information.Job_Title)) = 'ACCOUNT MANAGER';
+
+ 
+Quit;
+/*CONSULTA A TABLA CON DOS CAMPOS DE BASE DE ORION */
+
+proc sql;
+    select distinct Employee_ID, Job_Title
+    from orion.employee_information;
+quit;
+
